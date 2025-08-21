@@ -11,36 +11,47 @@ import org.acme.domain.dtos.SimulationsResultDto;
 import org.acme.domain.enums.SimulationType;
 import org.acme.domain.exceptions.InvalidDesiredValueException;
 import org.acme.domain.exceptions.InvalidPeriodException;
-import org.acme.infrastructure.model.Product;
 import org.acme.infrastructure.repository.ProductRepository;
+import org.acme.infrastructure.tables.ProductTable;
+import org.acme.infrastructure.tables.SimulationResultTable;
+import org.acme.infrastructure.tables.SimulationTable;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.persistence.NoResultException;
+import jakarta.transaction.Transactional;
 
 @ApplicationScoped
 public class SimulateLoanUC {
-    @Inject
-    private ProductRepository productRepository;
-    private SimulationSolicitationDto simulationSolicitation;
-    private Product product;
-    private boolean productHasBiggestMinValue;
+    private @Inject ProductRepository productRepository;
 
+    private SimulationSolicitationDto simulationSolicitation;
+    private boolean productHasBiggestMinValue;
+    private ProductTable productDbEntity;
+    private SimulationTable simulationDbEntity;
+    private SimulationResultTable simulationResultDbEntity;
+
+    @Transactional
     public SimulationsResultDto execute(SimulationSolicitationDto solicitation)
         throws InvalidDesiredValueException, InvalidPeriodException, NoResultException
     {
         this.simulationSolicitation = solicitation;
         this.validateSolicitation();
         
-        var idSimulacao = 20180702;
-        var simulationsResult = new SimulationsResultDto(
-            idSimulacao,
-            product.getId(),
-            product.getName(),
-            product.getInterestRate(),
-            this.calculateSimulations()
-        );
+        this.persistSimulation();
+        var simulationsResult = this.createSimulationsResult();
+        
         return simulationsResult;
+    }
+
+    private SimulationsResultDto createSimulationsResult() {
+        return new SimulationsResultDto(
+            this.simulationDbEntity.id,
+            this.productDbEntity.getId(),
+            this.productDbEntity.getName(),
+            this.productDbEntity.getInterestRate(),
+            this.createSimulations()
+        );
     }
 
     private void validateSolicitation() throws InvalidDesiredValueException, InvalidPeriodException {
@@ -53,17 +64,43 @@ public class SimulateLoanUC {
         }
 
         var biggestMinValueProduct = this.productRepository.getBiggestMinValueProduct();
+
         if (this.simulationSolicitation.desiredValue() > biggestMinValueProduct.getMinValue()) {
-            this.product = biggestMinValueProduct;
+            this.productDbEntity = biggestMinValueProduct;
             this.productHasBiggestMinValue = true;
         } else {
-            this.product = this.productRepository.findBySolicitationValue(
+            this.productDbEntity = this.productRepository.findBySolicitationValue(
                 this.simulationSolicitation.desiredValue()
             );
             this.productHasBiggestMinValue = false;
         }
 
         this.validateSolicitationPeriodRange();
+    }
+    
+    @Transactional
+    protected ArrayList<PresentSimulationDto> createSimulations(){
+        var simulationsStream = Arrays.stream(SimulationType.values()).map(
+            (simulationType) -> {
+                this.persistSimulationResult(simulationType);
+                return this.createSimulationPresentation(simulationType);
+            }
+        );
+        var simulations = simulationsStream.collect(Collectors.toCollection(ArrayList::new));
+        return simulations;
+    }
+
+    private PresentSimulationDto createSimulationPresentation(SimulationType simulationType) {
+        var installments = simulationType.getAmortizationSystem()
+            .setPresentValue(this.simulationSolicitation.desiredValue())
+            .setInterestRate(this.productDbEntity.getInterestRate())
+            .setPeriod(this.simulationSolicitation.period())
+            .calculateInstallments(this.simulationResultDbEntity)
+            .stream()
+            .map((installment) -> PresentInstallmentDto.from(installment))
+            .collect(Collectors.toCollection(ArrayList::new));
+
+        return new PresentSimulationDto(simulationType, installments);
     }
 
     private void validateSolicitationPeriodRange() throws InvalidPeriodException {
@@ -74,13 +111,13 @@ public class SimulateLoanUC {
         String errorMessage;
         errorMessage = String.format(
             "O período para uma simulação deste valor deve ser maior ou igual a %s.",
-            this.product.getMinMonthsAmount()
+            this.productDbEntity.getMinMonthsAmount()
         );
         if (! this.productHasBiggestMinValue) {
             errorMessage = String.format(
             "O período para uma simulação deste valor deve estar entre %s e %s.",
-                this.product.getMinMonthsAmount(),
-                this.product.getMaxMonthsAmount()
+                this.productDbEntity.getMinMonthsAmount(),
+                this.productDbEntity.getMaxMonthsAmount()
             );
         }
 
@@ -89,33 +126,32 @@ public class SimulateLoanUC {
 
     private boolean isPeriodRangeValid() throws InvalidPeriodException {
         if (this.productHasBiggestMinValue) {
-            return this.simulationSolicitation.period() >= this.product.getMinMonthsAmount();
+            return this.simulationSolicitation.period() >= this.productDbEntity.getMinMonthsAmount();
         }
 
         var isPeriodRangeValid =
-            this.simulationSolicitation.period() >= this.product.getMinMonthsAmount()
-            && this.simulationSolicitation.period() <= this.product.getMaxMonthsAmount();
+            this.simulationSolicitation.period() >= this.productDbEntity.getMinMonthsAmount()
+            && this.simulationSolicitation.period() <= this.productDbEntity.getMaxMonthsAmount();
 
         return isPeriodRangeValid;
     }
 
-    private ArrayList<PresentSimulationDto> calculateSimulations(){
-        var simulationsStream = Arrays.stream(SimulationType.values()).map(
-            (simulationType) -> this.createSimulation(simulationType)
-        );
-        var simulations = simulationsStream.collect(Collectors.toCollection(ArrayList::new));
-        return simulations;
+    @Transactional
+    protected void persistSimulation() {
+        var simulation = new SimulationTable();
+        simulation.desiredValue = this.simulationSolicitation.desiredValue();
+        simulation.period = this.simulationSolicitation.period();
+        simulation.product = this.productDbEntity;
+        simulation.persist();
+        this.simulationDbEntity = simulation;
     }
 
-    private PresentSimulationDto createSimulation(SimulationType simulationType) {
-        var installments = simulationType.getAmortizationSystem()
-            .setPresentValue(this.simulationSolicitation.desiredValue())
-            .setInterestRate(this.product.getInterestRate())
-            .setPeriod(this.simulationSolicitation.period())
-            .calculateInstallments()
-            .stream()
-            .map((installment) -> PresentInstallmentDto.from(installment))
-            .collect(Collectors.toCollection(ArrayList::new));
-        return new PresentSimulationDto(simulationType, installments);
+    @Transactional
+    protected void persistSimulationResult(SimulationType simulationType) {
+        var simulationResultDbEntity = new SimulationResultTable();
+        simulationResultDbEntity.type = simulationType;
+        simulationResultDbEntity.simulation = this.simulationDbEntity;
+        simulationResultDbEntity.persist();
+        this.simulationResultDbEntity = simulationResultDbEntity;
     }
 }

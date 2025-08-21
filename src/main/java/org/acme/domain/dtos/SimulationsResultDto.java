@@ -3,7 +3,7 @@ package org.acme.domain.dtos;
 import java.util.ArrayList;
 
 public record SimulationsResultDto(
-        int idSimulacao,
+        Long idSimulacao,
         Long codigoProduto,
         String descricaoProduto,
         double taxaJuros,

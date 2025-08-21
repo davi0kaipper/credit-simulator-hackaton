@@ -3,12 +3,13 @@ package org.acme.domain.models.amortization;
 import java.util.ArrayList;
 
 import org.acme.domain.models.Installment;
+import org.acme.infrastructure.tables.SimulationResultTable;
 
 public class Price extends AmortizationSystem {
     public Price() { }
 
     @Override
-    public ArrayList<Installment> calculateInstallments() {
+    public ArrayList<Installment> calculateInstallments(SimulationResultTable simulationResult) {
         ArrayList<Installment> installments = new ArrayList<>();
         var presentValuePivot = this.presentValue;
         var value = this.calculateInstallmentValue();
@@ -23,6 +24,7 @@ public class Price extends AmortizationSystem {
                 value
             );
             installments.add(installment);
+            this.persistInstallment(installment, simulationResult);
             presentValuePivot -= amortization;
         }
 

@@ -1,6 +1,6 @@
 package org.acme.domain.dtos;
 
-import org.acme.infrastructure.model.Product;
+import org.acme.infrastructure.tables.ProductTable;
 
 public record  ProductDto(
     Long id,
@@ -11,7 +11,7 @@ public record  ProductDto(
     Double minValue,
     Double maxValue
 ) {
-    public static ProductDto from(Product product) {
+    public static ProductDto from(ProductTable product) {
         return new ProductDto(
             product.getId(),
             product.getName(),

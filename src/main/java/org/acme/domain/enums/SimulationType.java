@@ -5,14 +5,8 @@ import org.acme.domain.models.amortization.Price;
 import org.acme.domain.models.amortization.Sac;
 
 public enum SimulationType {
-    SAC("SAC"),
-    PRICE("PRICE");
-
-    public final String label;
-
-    private SimulationType(String label){
-        this.label = label;
-    }
+    SAC,
+    PRICE;
 
     public AmortizationSystem getAmortizationSystem() {
         return switch (this) {

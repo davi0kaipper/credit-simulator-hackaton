@@ -2,7 +2,7 @@ package org.acme.infrastructure.repository;
 
 import java.util.List;
 
-import org.acme.infrastructure.model.Product;
+import org.acme.infrastructure.tables.ProductTable;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.persistence.EntityManager;
@@ -10,33 +10,32 @@ import jakarta.persistence.PersistenceContext;
 
 @ApplicationScoped
 public class ProductRepository {
-
     @PersistenceContext
     private EntityManager entityManager;
 
-    public List<Product> findAll() {
+    public List<ProductTable> findAll() {
         return entityManager
-            .createQuery("FROM Product", Product.class)
+            .createQuery("FROM ProductTable", ProductTable.class)
             .getResultList();
     }
 
-    public Product findById(Long id) {
-        return entityManager.find(Product.class, id);
+    public ProductTable findById(Long id) {
+        return entityManager.find(ProductTable.class, id);
     }
 
-    public Product findBySolicitationValue(double value) {
+    public ProductTable findBySolicitationValue(double value) {
         return entityManager.createQuery(
-        "SELECT p FROM Product p WHERE p.minValue <= :val AND p.maxValue >= :val",
-        Product.class)
+        "SELECT p FROM ProductTable p WHERE p.minValue <= :val AND p.maxValue >= :val",
+        ProductTable.class)
         .setParameter("val", value)
         .getSingleResult();
     }
 
-    public Product getBiggestMinValueProduct() {
+    public ProductTable getBiggestMinValueProduct() {
         return entityManager
             .createQuery(
-                "SELECT p FROM Product p ORDER BY p.minValue DESC LIMIT 1",
-                Product.class
+                "SELECT p FROM ProductTable p ORDER BY p.minValue DESC LIMIT 1",
+                ProductTable.class
             )
             .getSingleResult();
     }

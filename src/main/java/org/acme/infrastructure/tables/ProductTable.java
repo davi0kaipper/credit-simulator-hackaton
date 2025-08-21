@@ -1,4 +1,4 @@
-package org.acme.infrastructure.model;
+package org.acme.infrastructure.tables;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,7 +9,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "PRODUTO")
-public class Product {
+public class ProductTable {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "CO_PRODUTO")
     private Long id;
@@ -32,7 +32,7 @@ public class Product {
     @Column(name = "VR_MAXIMO")
     private Double maxValue;
 
-    public Product() { }
+    public ProductTable() { }
 
     public Long getId() {
         return id;

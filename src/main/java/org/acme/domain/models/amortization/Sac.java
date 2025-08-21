@@ -3,6 +3,7 @@ package org.acme.domain.models.amortization;
 import java.util.ArrayList;
 
 import org.acme.domain.models.Installment;
+import org.acme.infrastructure.tables.SimulationResultTable;
 
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -11,7 +12,7 @@ public class Sac extends AmortizationSystem{
     public Sac() { }
 
     @Override
-    public ArrayList<Installment> calculateInstallments() {
+    public ArrayList<Installment> calculateInstallments(SimulationResultTable simulationResult) {
         var installments = new ArrayList<Installment>();
         var presentValuePivot = this.presentValue;
         var amortization = this.presentValue / this.period;
@@ -26,6 +27,7 @@ public class Sac extends AmortizationSystem{
                 value
             );
             installments.add(installment);
+            this.persistInstallment(installment, simulationResult);
             presentValuePivot -= amortization;
         }
 
