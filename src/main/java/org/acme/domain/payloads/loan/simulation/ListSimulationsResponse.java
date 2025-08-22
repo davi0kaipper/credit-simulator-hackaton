@@ -4,20 +4,20 @@ import java.util.List;
 
 import org.acme.domain.dtos.ListSimulationsDto;
 
-public record ListSimulationsPayload(
+public record ListSimulationsResponse(
     int pagina,
     int qtdRegistros,
     int qtdRegistrosPagina,
-    List<SimulationRecordPayload> registros
+    List<SimulationRecordResponse> registros
 ){
-    public static ListSimulationsPayload from(
+    public static ListSimulationsResponse from(
         ListSimulationsDto listSimulationsDto
     ){
-        return new ListSimulationsPayload(
+        return new ListSimulationsResponse(
             listSimulationsDto.page(),
             listSimulationsDto.recordsAmount(),
             listSimulationsDto.recordsAmountByPage(),
-            listSimulationsDto.records().stream().map(SimulationRecordPayload::from).toList()
+            listSimulationsDto.records().stream().map(SimulationRecordResponse::from).toList()
         );
     }
 }

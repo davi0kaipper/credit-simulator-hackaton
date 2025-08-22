@@ -1,6 +1,6 @@
 package org.acme.infrastructure.tables;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import io.quarkus.hibernate.orm.panache.Panache;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
@@ -14,13 +14,14 @@ import jakarta.persistence.Table;
 public class SimulationTable extends PanacheEntity {
     public Double desiredValue;
     public Integer period;
+    public Double interestRate;
     @ManyToOne
     @JoinColumn(name = "product_id")
     public ProductTable product;
-    public LocalDateTime timestamp;
+    public LocalDate timestamp;
 
     public SimulationTable() {
-        this.timestamp = LocalDateTime.now();
+        this.timestamp = LocalDate.now();
     }
 
     public double getInstallmentsTotalAmountBySimulationId(Long simulationId) {

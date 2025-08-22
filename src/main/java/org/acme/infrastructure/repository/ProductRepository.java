@@ -39,4 +39,22 @@ public class ProductRepository {
             )
             .getSingleResult();
     }
+
+    public ProductTable getSummaryByProductId() {
+        return entityManager
+            .createQuery(
+                "SELECT p FROM ProductTable p ORDER BY p.minValue DESC LIMIT 1",
+                ProductTable.class
+            )
+            .getSingleResult();
+    }
+
+    public List<Long> listIdsOfProductsReferecendBySimulations() {
+        return entityManager
+            .createQuery(
+                "SELECT DISTINCT s.product.id FROM SimulationTable s",
+                Long.class
+            )
+            .getResultList();
+    }
 }

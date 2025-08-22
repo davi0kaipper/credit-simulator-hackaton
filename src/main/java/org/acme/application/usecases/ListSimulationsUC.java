@@ -20,16 +20,20 @@ public class ListSimulationsUC {
         Integer page,
         Integer recordsAmountByPage
     ) throws InvalidPageNumberException, InvalidRecordAmountByPageException {
-        if (page < 1) {
-            throw new InvalidPageNumberException(
-                "O número da página deve ser maior ou igual a 1."
-            );
+        if (page != null) {
+            if (page < 1) {
+                throw new InvalidPageNumberException(
+                    "O número da página deve ser maior ou igual a 1."
+                );
+            }
         }
 
-        if (recordsAmountByPage < 1) {
-            throw new InvalidRecordAmountByPageException(
-                "A quantidade de registros por páginas deve ser maior ou igual a 1."
-            );
+        if (recordsAmountByPage != null) {
+            if (recordsAmountByPage < 1) {
+                throw new InvalidRecordAmountByPageException(
+                    "A quantidade de registros por páginas deve ser maior ou igual a 1."
+                );
+            }
         }
 
         var currentPage = page != null ? page - 1 : 0;

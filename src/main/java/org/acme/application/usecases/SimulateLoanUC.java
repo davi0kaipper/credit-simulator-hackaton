@@ -141,6 +141,7 @@ public class SimulateLoanUC {
         var simulation = new SimulationTable();
         simulation.desiredValue = this.simulationSolicitation.desiredValue();
         simulation.period = this.simulationSolicitation.period();
+        simulation.interestRate = this.productDbEntity.getInterestRate();
         simulation.product = this.productDbEntity;
         simulation.persist();
         this.simulationDbEntity = simulation;

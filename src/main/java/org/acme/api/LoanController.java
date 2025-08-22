@@ -10,7 +10,7 @@ import org.acme.domain.exceptions.InvalidPageNumberException;
 import org.acme.domain.exceptions.InvalidPeriodException;
 import org.acme.domain.exceptions.InvalidRecordAmountByPageException;
 import org.acme.domain.payloads.errors.ErrorResponse;
-import org.acme.domain.payloads.loan.simulation.ListSimulationsPayload;
+import org.acme.domain.payloads.loan.simulation.ListSimulationsResponse;
 import org.acme.domain.payloads.loan.simulation.SimulationRequest;
 
 import jakarta.inject.Inject;
@@ -25,8 +25,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 @Path("/loan")
 public class LoanController {
-    private @Inject SimulateLoanUC simulateLoanUC;
     private @Inject ListSimulationsUC listSimulationsUC;
+    private @Inject SimulateLoanUC simulateLoanUC;
     
     @GET
     @Path("/simulations")
@@ -38,7 +38,7 @@ public class LoanController {
         Response.ResponseBuilder response;
         try {
             var list = listSimulationsUC.execute(page, recordsAmountByPage);
-            var simulationsList = ListSimulationsPayload.from(list);
+            var simulationsList = ListSimulationsResponse.from(list);
             response = Response.ok(simulationsList);
         }
         catch (InvalidPageNumberException | InvalidRecordAmountByPageException e) {

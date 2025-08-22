@@ -5,18 +5,18 @@ import java.math.RoundingMode;
 
 import org.acme.domain.dtos.SimulationRecordDto;
 
-public record SimulationRecordPayload(
+public record SimulationRecordResponse(
     Long idSimulacao,
     BigDecimal valorDesejado,
     int prazo,
     BigDecimal valorTotalParcelas
 ) {
-    public static SimulationRecordPayload from(SimulationRecordDto simulationRecordDto) {
-        return new SimulationRecordPayload(
+    public static SimulationRecordResponse from(SimulationRecordDto simulationRecordDto) {
+        return new SimulationRecordResponse(
             simulationRecordDto.simulationId(),
-            SimulationRecordPayload.formatValue(simulationRecordDto.desiredValue()),
+            SimulationRecordResponse.formatValue(simulationRecordDto.desiredValue()),
             simulationRecordDto.period(),
-            SimulationRecordPayload.formatValue(simulationRecordDto.installmentsTotalAmount())
+            SimulationRecordResponse.formatValue(simulationRecordDto.installmentsTotalAmount())
         );
     }
 
