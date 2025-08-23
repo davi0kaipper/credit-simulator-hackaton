@@ -2,15 +2,15 @@ package org.acme.domain.models;
 
 public class Installment {
     int number;
-    double amortization;
-    double interest;
-    double value;
+    Double amortization;
+    Double interest;
+    Double value;
 
     public Installment(
         int number,
-        double amortization,
-        double interest,
-        double value
+        Double amortization,
+        Double interest,
+        Double value
     ){
         this.number = number;
         this.amortization = amortization;
@@ -22,15 +22,15 @@ public class Installment {
         return number;
     }
 
-    public double getAmortization() {
+    public Double getAmortization() {
         return amortization;
     }
 
-    public double getInterest() {
+    public Double getInterest() {
         return interest;
     }
 
-    public double getValue() {
+    public Double getValue() {
         return value;
     }
 }

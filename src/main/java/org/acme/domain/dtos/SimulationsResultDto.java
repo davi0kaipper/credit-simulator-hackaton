@@ -6,6 +6,6 @@ public record SimulationsResultDto(
         Long idSimulacao,
         Long codigoProduto,
         String descricaoProduto,
-        double taxaJuros,
+        Double taxaJuros,
         ArrayList<PresentSimulationDto> resultadoSimulacao
 ) { }

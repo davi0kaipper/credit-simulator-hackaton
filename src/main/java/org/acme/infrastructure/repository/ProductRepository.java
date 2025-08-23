@@ -23,7 +23,7 @@ public class ProductRepository {
         return entityManager.find(ProductTable.class, id);
     }
 
-    public ProductTable findBySolicitationValue(double value) {
+    public ProductTable findBySolicitationValue(Double value) {
         return entityManager.createQuery(
         "SELECT p FROM ProductTable p WHERE p.minValue <= :val AND p.maxValue >= :val",
         ProductTable.class)

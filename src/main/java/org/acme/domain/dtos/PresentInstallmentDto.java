@@ -20,7 +20,7 @@ public record PresentInstallmentDto(
         );
     }
 
-    static BigDecimal formatValue(double value) {
+    static BigDecimal formatValue(Double value) {
         return BigDecimal.valueOf(value).setScale(2, RoundingMode.HALF_UP);
     }
 }

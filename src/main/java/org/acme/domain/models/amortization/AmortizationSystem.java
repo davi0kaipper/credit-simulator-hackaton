@@ -9,8 +9,8 @@ import org.acme.infrastructure.tables.SimulationResultTable;
 import jakarta.transaction.Transactional;
 
 public abstract class AmortizationSystem {
-    protected double presentValue;
-    protected double interestRate;
+    protected Double presentValue;
+    protected Double interestRate;
     protected int period;
 
     public abstract ArrayList<Installment> calculateInstallments(SimulationResultTable simulationResult);
@@ -23,12 +23,12 @@ public abstract class AmortizationSystem {
         InstallmentTable.from(installment, simulationResult).persist();
     }
 
-    public AmortizationSystem setPresentValue(double presentValue) {
+    public AmortizationSystem setPresentValue(Double presentValue) {
         this.presentValue = presentValue;
         return this;
     }
 
-    public AmortizationSystem setInterestRate(double interestRate) {
+    public AmortizationSystem setInterestRate(Double interestRate) {
         this.interestRate = interestRate;
         return this;
     }

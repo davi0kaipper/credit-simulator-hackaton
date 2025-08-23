@@ -58,7 +58,7 @@ public class PresentSimulationsMetricsUC {
                 SimulationsSummaryByProductDto.empty(product)
             );
         }
-
+        
         var statistics = this.statisticsRepository.getSimulationsStatistics(product.getId(), referenceDate);
         var summary = SimulationsSummaryByProductDto.from(product, statistics.get());
 

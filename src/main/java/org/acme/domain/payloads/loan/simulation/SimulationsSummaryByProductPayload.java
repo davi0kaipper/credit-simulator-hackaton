@@ -1,23 +1,30 @@
 package org.acme.domain.payloads.loan.simulation;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import org.acme.domain.dtos.summary.SimulationsSummaryByProductDto;
 
 public record SimulationsSummaryByProductPayload(
     Long codigoProduto,
     String descricaoProduto,
-    double taxaMediaJuro,
-    double valorMedioPrestacao,
-    double valorTotalDesejado,
-    double valorTotalCredito
+    Double taxaMediaJuro,
+    BigDecimal valorMedioPrestacao,
+    Double valorTotalDesejado,
+    BigDecimal valorTotalCredito
 ){
     public static SimulationsSummaryByProductPayload from(SimulationsSummaryByProductDto summaryDto) {
         return new SimulationsSummaryByProductPayload(
             summaryDto.productId(),
             summaryDto.productDescription(),
             summaryDto.interestRateAverage(),
-            summaryDto.installmentAverage(),
+            SimulationsSummaryByProductPayload.formatValue(summaryDto.installmentAverage()),
             summaryDto.totalDesiredValue(),
-            summaryDto.totalCredit()
+            SimulationsSummaryByProductPayload.formatValue(summaryDto.totalCredit())
         );
+    }
+
+    static BigDecimal formatValue(Double value) {
+        return BigDecimal.valueOf(value).setScale(2, RoundingMode.HALF_UP);
     }
 }

@@ -1,15 +1,18 @@
 package org.acme.domain.dtos;
 
+import org.acme.infrastructure.tables.InstallmentTable;
 import org.acme.infrastructure.tables.SimulationTable;
 
 public record SimulationRecordDto(
     Long simulationId,
-    double desiredValue,
+    Double desiredValue,
     int period,
-    double installmentsTotalAmount
+    Double installmentsTotalAmount
 ) {
     public static SimulationRecordDto from(SimulationTable simulation) {
-        var installmentsTotalAmount = simulation.getInstallmentsTotalAmountBySimulationId(simulation.id);
+        var installmentsTotalAmount = InstallmentTable
+            .getInstallmentsTotalAmountBySimulationId(simulation.id);
+
         return new SimulationRecordDto(
             simulation.id,
             simulation.desiredValue,

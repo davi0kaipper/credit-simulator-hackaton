@@ -8,6 +8,6 @@ public record SimulationResponse(
     int idSimulacao,
     int codigoProduto,
     String descricaoProduto,
-    double taxaJuros,
+    Double taxaJuros,
     ArrayList<Simulation> resultadoSimulacao
 ) { }

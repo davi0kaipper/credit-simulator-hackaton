@@ -1,6 +1,6 @@
 package org.acme.domain.dtos;
 
 public record SimulationSolicitationDto(
-    double desiredValue,
+    Double desiredValue,
     int period
 ) { }

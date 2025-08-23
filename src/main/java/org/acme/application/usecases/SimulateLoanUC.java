@@ -59,8 +59,8 @@ public class SimulateLoanUC {
             throw new InvalidDesiredValueException("O valor mínimo para a simulação é R$ 200,00.");
         }
 
-        if (this.simulationSolicitation.period() < 0) {
-            throw new InvalidPeriodException("O período mínimo para a simulação é 0.");
+        if (this.simulationSolicitation.period() < 1) {
+            throw new InvalidPeriodException("O período mínimo para a simulação é 1.");
         }
 
         var biggestMinValueProduct = this.productRepository.getBiggestMinValueProduct();

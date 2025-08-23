@@ -40,8 +40,7 @@ public class LoanController {
             var list = listSimulationsUC.execute(page, recordsAmountByPage);
             var simulationsList = ListSimulationsResponse.from(list);
             response = Response.ok(simulationsList);
-        }
-        catch (InvalidPageNumberException | InvalidRecordAmountByPageException e) {
+        } catch (InvalidPageNumberException | InvalidRecordAmountByPageException e) {
             var errorMessages = new ArrayList<String>();
             errorMessages.add(e.getMessage());
             var unprocessableEntityCode = 422;

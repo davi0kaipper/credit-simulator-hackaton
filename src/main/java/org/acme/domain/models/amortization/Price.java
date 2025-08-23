@@ -31,7 +31,7 @@ public class Price extends AmortizationSystem {
         return installments;
     }
 
-    public double calculateInstallmentValue() {
+    public Double calculateInstallmentValue() {
         var power = Math.pow((1 + this.interestRate), period);
         var numerator = power * this.interestRate;
         var denominator = power - 1;

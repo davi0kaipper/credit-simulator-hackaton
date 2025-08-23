@@ -6,14 +6,14 @@ public class SimulationsResult {
     int idSimulacao;
     int codigoProduto;
     String descricaoProduto;
-    double taxaJuros;
+    Double taxaJuros;
     ArrayList<Simulation> resultadoSimulacao;
 
     public SimulationsResult(
         int idSimulacao,
         int codigoProduto,
         String descricaoProduto,
-        double taxaJuros,
+        Double taxaJuros,
         ArrayList<Simulation> resultadoSimulacao
     ){
         this.idSimulacao = idSimulacao;
