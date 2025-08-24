@@ -1,24 +1,26 @@
 package org.acme.domain.dtos.summary;
 
+import java.math.BigDecimal;
+
 import org.acme.domain.dtos.metrics.MetricStatisticalDataDto;
 import org.acme.infrastructure.tables.ProductTable;
 
 public record SimulationsSummaryByProductDto(
     Long productId,
     String productDescription,
-    Double interestRateAverage,
+    BigDecimal interestRateAverage,
     Double installmentAverage,
     Double totalDesiredValue,
     Double totalCredit
 ) {
     public static SimulationsSummaryByProductDto from(MetricStatisticalDataDto data) {
         return new SimulationsSummaryByProductDto(
-            data.productId(),
-            data.productDescription(),
-            data.interestRateAverage(),
-            data.installmentAverage(),
-            data.totalDesiredValue(),
-            data.totalCredit()
+            data.getProductId(),
+            data.getProductDescription(),
+            data.getInterestRateAverage(),
+            data.getInstallmentAverage(),
+            data.getTotalDesiredValue(),
+            data.getTotalCredit()
         );
     }
 

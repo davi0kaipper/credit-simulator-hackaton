@@ -1,4 +1,4 @@
-package org.acme.infrastructure.tables;
+package org.acme.domain.entities;
 
 import java.time.LocalDate;
 
@@ -8,7 +8,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "telemetry")
-public class TelemetryTable extends PanacheEntity {
+public class TelemetryEntity extends PanacheEntity {
     public String method;
     public String uri;
     public Integer averageTime;
@@ -18,7 +18,7 @@ public class TelemetryTable extends PanacheEntity {
     public Long successfulRequests;
     public LocalDate referenceDate;
 
-    public TelemetryTable () { }
+    public TelemetryEntity () { }
 
     public static Integer calculateSuccesfulRequest(Integer responseStatus) {
         return responseStatus.equals(200) ? 1 : 0;

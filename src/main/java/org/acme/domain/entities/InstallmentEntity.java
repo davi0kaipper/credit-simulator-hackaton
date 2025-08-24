@@ -1,4 +1,6 @@
-package org.acme.infrastructure.tables;
+package org.acme.domain.entities;
+
+import java.math.BigDecimal;
 
 import org.acme.domain.models.Installment;
 
@@ -10,19 +12,19 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "installments")
-public class InstallmentTable extends PanacheEntity {
+public class InstallmentEntity extends PanacheEntity {
     public int number;
-    public Double amortization;
-    public Double interest;
-    public Double value;
+    public BigDecimal amortization;
+    public BigDecimal interest;
+    public BigDecimal value;
     @ManyToOne
     @JoinColumn(name = "simulation_result_id")
-    public SimulationResultTable simulationResult;
+    public SimulationResultEntity simulationResult;
     
-    public InstallmentTable() { }
+    public InstallmentEntity() { }
 
-    public static InstallmentTable from(Installment installment, SimulationResultTable simulationResult) {
-        var instance = new InstallmentTable();
+    public static InstallmentEntity from(Installment installment, SimulationResultEntity simulationResult) {
+        var instance = new InstallmentEntity();
         instance.number = installment.getNumber();
         instance.amortization = installment.getAmortization();
         instance.interest = installment.getInterest();

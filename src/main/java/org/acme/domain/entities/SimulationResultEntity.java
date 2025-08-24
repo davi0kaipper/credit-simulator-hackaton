@@ -1,4 +1,4 @@
-package org.acme.infrastructure.tables;
+package org.acme.domain.entities;
 
 import org.acme.domain.enums.SimulationType;
 
@@ -12,12 +12,12 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "simulation_results")
-public class SimulationResultTable extends PanacheEntity {
+public class SimulationResultEntity extends PanacheEntity {
     @Enumerated(EnumType.STRING)
     public SimulationType type;
     @ManyToOne
     @JoinColumn(name = "simulation_id")
-    public SimulationTable simulation;
+    public SimulationEntity simulation;
 
-    public SimulationResultTable() { }
+    public SimulationResultEntity() { }
 }

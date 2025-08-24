@@ -2,29 +2,16 @@ package org.acme.infrastructure.repository;
 
 import org.acme.infrastructure.tables.ProductTable;
 
+import io.quarkus.hibernate.orm.panache.PanacheRepositoryBase;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 
 @ApplicationScoped
-public class ProductRepository {
-    @PersistenceContext
-    private EntityManager entityManager;
-
+public class ProductRepository implements PanacheRepositoryBase<ProductTable, Long> {
     public ProductTable findBySolicitationValue(Double value) {
-        return entityManager.createQuery(
-        "SELECT p FROM ProductTable p WHERE p.minValue <= :val AND p.maxValue >= :val",
-        ProductTable.class)
-        .setParameter("val", value)
-        .getSingleResult();
+        return find("minValue <= ?1 and maxValue >= ?1", value).firstResult();
     }
 
     public ProductTable getBiggestMinValueProduct() {
-        return entityManager
-            .createQuery(
-                "SELECT p FROM ProductTable p ORDER BY p.minValue DESC LIMIT 1",
-                ProductTable.class
-            )
-            .getSingleResult();
+        return find("ORDER BY minValue DESC").firstResult();
     }
 }

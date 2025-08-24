@@ -1,22 +1,24 @@
 package org.acme.domain.models.amortization;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 
+import org.acme.domain.entities.SimulationResultEntity;
 import org.acme.domain.models.Installment;
-import org.acme.infrastructure.tables.SimulationResultTable;
 
 public class Price extends AmortizationSystem {
     public Price() { }
 
     @Override
-    public ArrayList<Installment> calculateInstallments(SimulationResultTable simulationResult) {
+    public ArrayList<Installment> calculateInstallments(SimulationResultEntity simulationResult) {
         ArrayList<Installment> installments = new ArrayList<>();
         var presentValuePivot = this.presentValue;
         var value = this.calculateInstallmentValue();
 
         for (int i = 1; i <= this.period; i++) {
-            var interest = presentValuePivot * interestRate;
-            var amortization = value - interest;
+            var interest = presentValuePivot.multiply(interestRate);
+            var amortization = value.subtract(interest);
             var installment = new Installment(
                 i,
                 amortization,
@@ -25,17 +27,18 @@ public class Price extends AmortizationSystem {
             );
             installments.add(installment);
             this.persistInstallment(installment, simulationResult);
-            presentValuePivot -= amortization;
+            presentValuePivot = presentValuePivot.subtract(amortization);
         }
 
         return installments;
     }
 
-    public Double calculateInstallmentValue() {
-        var power = Math.pow((1 + this.interestRate), period);
-        var numerator = power * this.interestRate;
+    public BigDecimal calculateInstallmentValue() {
+        var power = Math.pow((1 + this.interestRate.doubleValue()), this.period);
+        var numerator = BigDecimal.valueOf(power).multiply(this.interestRate);
         var denominator = power - 1;
-        var installment = this.presentValue * (numerator / denominator);
+        var division = numerator.divide(BigDecimal.valueOf(denominator), RoundingMode.HALF_UP);
+        var installment = this.presentValue.multiply(division);
         return installment;
     }
 }

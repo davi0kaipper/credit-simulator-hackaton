@@ -1,5 +1,6 @@
 package org.acme.application.usecases;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -8,13 +9,13 @@ import org.acme.domain.dtos.PresentInstallmentDto;
 import org.acme.domain.dtos.PresentSimulationDto;
 import org.acme.domain.dtos.SimulationSolicitationDto;
 import org.acme.domain.dtos.SimulationsResultDto;
+import org.acme.domain.entities.SimulationEntity;
+import org.acme.domain.entities.SimulationResultEntity;
 import org.acme.domain.enums.SimulationType;
 import org.acme.domain.exceptions.InvalidDesiredValueException;
 import org.acme.domain.exceptions.InvalidPeriodException;
 import org.acme.infrastructure.repository.ProductRepository;
 import org.acme.infrastructure.tables.ProductTable;
-import org.acme.infrastructure.tables.SimulationResultTable;
-import org.acme.infrastructure.tables.SimulationTable;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -23,18 +24,17 @@ import jakarta.transaction.Transactional;
 
 @ApplicationScoped
 public class SimulateLoanUC {
-    private @Inject ProductRepository productRepository;
+    @Inject
+    private ProductRepository productRepository;
 
     private SimulationSolicitationDto simulationSolicitation;
     private boolean productHasBiggestMinValue;
     private ProductTable productDbEntity;
-    private SimulationTable simulationDbEntity;
-    private SimulationResultTable simulationResultDbEntity;
+    private SimulationEntity simulationDbEntity;
+    private SimulationResultEntity simulationResultDbEntity;
 
-    @Transactional
     public SimulationsResultDto execute(SimulationSolicitationDto solicitation)
-        throws InvalidDesiredValueException, InvalidPeriodException, NoResultException
-    {
+        throws InvalidDesiredValueException, InvalidPeriodException, NoResultException {
         this.simulationSolicitation = solicitation;
         this.validateSolicitation();
         
@@ -54,7 +54,8 @@ public class SimulateLoanUC {
         );
     }
 
-    private void validateSolicitation() throws InvalidDesiredValueException, InvalidPeriodException {
+    @Transactional
+    protected void validateSolicitation() throws InvalidDesiredValueException, InvalidPeriodException {
         if (this.simulationSolicitation.desiredValue() < 200.0) {
             throw new InvalidDesiredValueException("O valor mínimo para a simulação é R$ 200,00.");
         }
@@ -92,7 +93,7 @@ public class SimulateLoanUC {
 
     private PresentSimulationDto createSimulationPresentation(SimulationType simulationType) {
         var installments = simulationType.getAmortizationSystem()
-            .setPresentValue(this.simulationSolicitation.desiredValue())
+            .setPresentValue(BigDecimal.valueOf(this.simulationSolicitation.desiredValue()))
             .setInterestRate(this.productDbEntity.getInterestRate())
             .setPeriod(this.simulationSolicitation.period())
             .calculateInstallments(this.simulationResultDbEntity)
@@ -138,18 +139,18 @@ public class SimulateLoanUC {
 
     @Transactional
     protected void persistSimulation() {
-        var simulation = new SimulationTable();
+        var simulation = new SimulationEntity();
         simulation.desiredValue = this.simulationSolicitation.desiredValue();
         simulation.period = this.simulationSolicitation.period();
         simulation.interestRate = this.productDbEntity.getInterestRate();
-        simulation.product = this.productDbEntity;
+        simulation.productId = this.productDbEntity.getId();
         simulation.persist();
         this.simulationDbEntity = simulation;
     }
 
     @Transactional
     protected void persistSimulationResult(SimulationType simulationType) {
-        var simulationResultDbEntity = new SimulationResultTable();
+        var simulationResultDbEntity = new SimulationResultEntity();
         simulationResultDbEntity.type = simulationType;
         simulationResultDbEntity.simulation = this.simulationDbEntity;
         simulationResultDbEntity.persist();

@@ -1,5 +1,6 @@
 package org.acme.domain.payloads.loan.simulation;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import org.acme.domain.dtos.SimulationsResultDto;
@@ -8,7 +9,7 @@ public record SimulationsResultResponse(
 	Long idSimulacao,
 	Long codigoProduto,
 	String descricaoProduto,
-	Double taxaJuros,
+	BigDecimal taxaJuros,
 	List<PresentSimulationFormat> resultadoSimulacao
 ) {
 

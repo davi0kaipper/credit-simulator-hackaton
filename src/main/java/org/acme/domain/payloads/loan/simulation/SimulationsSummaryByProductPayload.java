@@ -8,7 +8,7 @@ import org.acme.domain.dtos.summary.SimulationsSummaryByProductDto;
 public record SimulationsSummaryByProductPayload(
     Long codigoProduto,
     String descricaoProduto,
-    Double taxaMediaJuro,
+    BigDecimal taxaMediaJuro,
     BigDecimal valorMedioPrestacao,
     BigDecimal valorTotalDesejado,
     BigDecimal valorTotalCredito

@@ -1,25 +1,24 @@
-package org.acme.infrastructure.tables;
+package org.acme.domain.entities;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "simulations")
-public class SimulationTable extends PanacheEntity {
+public class SimulationEntity extends PanacheEntity {
     public Double desiredValue;
     public Integer period;
-    public Double interestRate;
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    public ProductTable product;
+    @Column(precision = 10, scale = 9)
+    public BigDecimal interestRate;
+    public Long productId;
     public LocalDate timestamp;
 
-    public SimulationTable() {
+    public SimulationEntity() {
         this.timestamp = LocalDate.now();
     }
 }

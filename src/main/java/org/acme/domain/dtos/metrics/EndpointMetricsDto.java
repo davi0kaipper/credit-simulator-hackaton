@@ -1,6 +1,6 @@
 package org.acme.domain.dtos.metrics;
 
-import org.acme.infrastructure.tables.TelemetryTable;
+import org.acme.domain.entities.TelemetryEntity;
 
 public record EndpointMetricsDto(
     String uri,
@@ -10,7 +10,7 @@ public record EndpointMetricsDto(
     Integer maxTime,
     Double successPercentage
 ){
-    public static EndpointMetricsDto from(TelemetryTable telemetry) {
+    public static EndpointMetricsDto from(TelemetryEntity telemetry) {
         Double successPercentage = telemetry.successfulRequests.doubleValue() / telemetry.requestsAmount.doubleValue();
         return new EndpointMetricsDto(
             telemetry.method + " " + telemetry.uri,

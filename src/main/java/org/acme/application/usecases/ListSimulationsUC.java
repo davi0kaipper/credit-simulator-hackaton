@@ -5,10 +5,10 @@ import java.util.stream.Stream;
 
 import org.acme.domain.dtos.ListSimulationsDto;
 import org.acme.domain.dtos.SimulationRecordDto;
+import org.acme.domain.entities.SimulationEntity;
 import org.acme.domain.exceptions.InvalidPageNumberException;
 import org.acme.domain.exceptions.InvalidRecordAmountByPageException;
 import org.acme.infrastructure.repository.SimulationRepository;
-import org.acme.infrastructure.tables.SimulationTable;
 
 import io.quarkus.panache.common.Page;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -51,7 +51,7 @@ public class ListSimulationsUC {
 
             var simulationsList = new ListSimulationsDto(
                 currentPage + 1,
-                (int) SimulationTable.count(),
+                (int) SimulationEntity.count(),
                 simulationsRecords.size(),
                 simulationsRecords
             );

@@ -1,16 +1,18 @@
 package org.acme.domain.models;
 
+import java.math.BigDecimal;
+
 public class Installment {
     int number;
-    Double amortization;
-    Double interest;
-    Double value;
+    BigDecimal amortization;
+    BigDecimal interest;
+    BigDecimal value;
 
     public Installment(
         int number,
-        Double amortization,
-        Double interest,
-        Double value
+        BigDecimal amortization,
+        BigDecimal interest,
+        BigDecimal value
     ){
         this.number = number;
         this.amortization = amortization;
@@ -22,15 +24,15 @@ public class Installment {
         return number;
     }
 
-    public Double getAmortization() {
+    public BigDecimal getAmortization() {
         return amortization;
     }
 
-    public Double getInterest() {
+    public BigDecimal getInterest() {
         return interest;
     }
 
-    public Double getValue() {
+    public BigDecimal getValue() {
         return value;
     }
 }

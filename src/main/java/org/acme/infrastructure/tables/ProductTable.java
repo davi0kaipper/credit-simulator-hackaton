@@ -1,5 +1,10 @@
 package org.acme.infrastructure.tables;
 
+import java.math.BigDecimal;
+
+import com.google.errorprone.annotations.Immutable;
+
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,7 +14,8 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "PRODUTO")
-public class ProductTable {
+@Immutable
+public class ProductTable extends PanacheEntityBase {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "CO_PRODUTO")
     private Long id;
@@ -17,8 +23,8 @@ public class ProductTable {
     @Column(name = "NO_PRODUTO")
     private String name;
 
-    @Column(name = "PC_TAXA_JUROS")
-    private Double interestRate;
+    @Column(name = "PC_TAXA_JUROS", precision = 10, scale = 8)
+    private BigDecimal interestRate;
 
     @Column(name = "NU_MINIMO_MESES")
     private Integer minMonthsAmount;
@@ -42,7 +48,7 @@ public class ProductTable {
         return name;
     }
 
-    public Double getInterestRate() {
+    public BigDecimal getInterestRate() {
         return interestRate;
     }
 
