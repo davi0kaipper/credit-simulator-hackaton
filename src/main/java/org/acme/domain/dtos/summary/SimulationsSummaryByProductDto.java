@@ -1,6 +1,6 @@
 package org.acme.domain.dtos.summary;
 
-import org.acme.domain.dtos.MetricStatisticalDataDto;
+import org.acme.domain.dtos.metrics.MetricStatisticalDataDto;
 import org.acme.infrastructure.tables.ProductTable;
 
 public record SimulationsSummaryByProductDto(
@@ -11,13 +11,10 @@ public record SimulationsSummaryByProductDto(
     Double totalDesiredValue,
     Double totalCredit
 ) {
-    public static SimulationsSummaryByProductDto from(
-        ProductTable product,
-        MetricStatisticalDataDto data
-    ){
+    public static SimulationsSummaryByProductDto from(MetricStatisticalDataDto data) {
         return new SimulationsSummaryByProductDto(
-            product.getId(),
-            product.getName(),
+            data.productId(),
+            data.productDescription(),
             data.interestRateAverage(),
             data.installmentAverage(),
             data.totalDesiredValue(),

@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import org.acme.domain.dtos.MetricStatisticalDataDto;
+import org.acme.domain.dtos.metrics.MetricStatisticalDataDto;
 import org.acme.domain.dtos.metrics.MicrometerTimer;
 import org.acme.infrastructure.tables.TelemetryTable;
 
@@ -17,36 +17,27 @@ public class StatisticsRepository {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public Optional<MetricStatisticalDataDto> getSimulationsStatistics(
-        Long productId,
-        LocalDate referenceDate
-    ){
+    public List<MetricStatisticalDataDto> getSimulationsStatistics(LocalDate referenceDate){
         return entityManager
             .createQuery(
                 """
                 SELECT
-                    (SELECT AVG(s.interestRate) FROM SimulationTable s
+                    s.product.id,
+                    p.name,
+                    AVG(DISTINCT s.interestRate) AS interest_rate_average,
+                    AVG(i.value) AS value_average,
+                    SUM(DISTINCT s.desiredValue) AS total_desired_value,
+                    SUM(i.value) / 2 AS total_value
+                    FROM InstallmentTable i
+                    JOIN SimulationResultTable sr ON i.simulationResult.id = sr.id
+                    JOIN SimulationTable s ON sr.simulation.id = s.id
+                    JOIN ProductTable p ON s.product.id = p.id
                     WHERE s.timestamp = :referenceDate
-                    AND s.product.id = :product_id) AS interest_rate_average,
-
-                    (SELECT AVG(i.value) FROM InstallmentTable i
-                    WHERE i.simulationResult.simulation.timestamp = :referenceDate
-                    AND i.simulationResult.simulation.product.id = :product_id) AS value_average,
-
-                    (SELECT SUM(s.desiredValue) FROM SimulationTable s
-                    WHERE s.timestamp = :referenceDate
-                    AND s.product.id = :product_id) AS total_desired_value,
-
-                    (SELECT SUM(i.value) FROM InstallmentTable i
-                    WHERE i.simulationResult.simulation.timestamp = :referenceDate
-                    AND i.simulationResult.simulation.product.id = :product_id) AS total_value
+                    GROUP BY s.product.id, p.name
                 """,
             MetricStatisticalDataDto.class
-            ).setParameter("product_id", productId)
-            .setParameter("referenceDate", referenceDate)
-            .getResultList()
-            .stream()
-            .findFirst();
+            ).setParameter("referenceDate", referenceDate)
+            .getResultList();
     }
 
     public List<TelemetryTable> findTelemetryDataByDate(

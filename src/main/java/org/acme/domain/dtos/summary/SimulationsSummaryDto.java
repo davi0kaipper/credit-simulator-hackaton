@@ -1,8 +1,9 @@
 package org.acme.domain.dtos.summary;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public record SimulationsSummaryDto(
     LocalDate referenceDate,
-    SimulationsSummaryByProductDto simulationsSummary
+    List<SimulationsSummaryByProductDto> simulationsSummary
 ) { }

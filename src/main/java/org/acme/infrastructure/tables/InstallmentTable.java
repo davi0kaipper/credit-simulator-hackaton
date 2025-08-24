@@ -2,7 +2,6 @@ package org.acme.infrastructure.tables;
 
 import org.acme.domain.models.Installment;
 
-import io.quarkus.hibernate.orm.panache.Panache;
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
@@ -30,18 +29,5 @@ public class InstallmentTable extends PanacheEntity {
         instance.value = installment.getValue();
         instance.simulationResult = simulationResult;
         return instance;
-    }
-
-    public static Double getInstallmentsTotalAmountBySimulationId(Long simulationId) {
-        var installmentsTotalAmount = Panache.getEntityManager()
-            .createQuery("""
-                    SELECT SUM(i.value) FROM InstallmentTable i
-                    WHERE i.simulationResult.simulation.id = :simulation_id
-                """,
-                Double.class
-            )
-            .setParameter("simulation_id", simulationId)
-            .getSingleResult();
-        return installmentsTotalAmount;
     }
 }

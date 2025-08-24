@@ -7,14 +7,18 @@ import org.acme.domain.dtos.ListSimulationsDto;
 import org.acme.domain.dtos.SimulationRecordDto;
 import org.acme.domain.exceptions.InvalidPageNumberException;
 import org.acme.domain.exceptions.InvalidRecordAmountByPageException;
+import org.acme.infrastructure.repository.SimulationRepository;
 import org.acme.infrastructure.tables.SimulationTable;
 
 import io.quarkus.panache.common.Page;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 @ApplicationScoped
 public class ListSimulationsUC {
+    private @Inject SimulationRepository simulationRepository;
+
     @Transactional
     public ListSimulationsDto execute(
         Integer page,
@@ -41,11 +45,9 @@ public class ListSimulationsUC {
             ? recordsAmountByPage
             : 200;
         var pagination = Page.of(currentPage, currentRecordsAmountByPage);
-        var simulations = SimulationTable.findAll().page(pagination);
-        try (Stream<SimulationTable> stream = simulations.stream()) {
-            var simulationsRecords = stream
-                .map(SimulationRecordDto::from)
-                .collect(Collectors.toList());
+        var simulations = this.simulationRepository.getSimulationsAndItsInstallmentsTotalAmount(pagination);
+        try (Stream<SimulationRecordDto> stream = simulations.stream()) {
+            var simulationsRecords = stream.collect(Collectors.toList());
 
             var simulationsList = new ListSimulationsDto(
                 currentPage + 1,

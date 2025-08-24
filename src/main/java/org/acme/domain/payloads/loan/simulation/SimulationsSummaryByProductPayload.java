@@ -10,7 +10,7 @@ public record SimulationsSummaryByProductPayload(
     String descricaoProduto,
     Double taxaMediaJuro,
     BigDecimal valorMedioPrestacao,
-    Double valorTotalDesejado,
+    BigDecimal valorTotalDesejado,
     BigDecimal valorTotalCredito
 ){
     public static SimulationsSummaryByProductPayload from(SimulationsSummaryByProductDto summaryDto) {
@@ -19,7 +19,7 @@ public record SimulationsSummaryByProductPayload(
             summaryDto.productDescription(),
             summaryDto.interestRateAverage(),
             SimulationsSummaryByProductPayload.formatValue(summaryDto.installmentAverage()),
-            summaryDto.totalDesiredValue(),
+            SimulationsSummaryByProductPayload.formatValue(summaryDto.totalDesiredValue()),
             SimulationsSummaryByProductPayload.formatValue(summaryDto.totalCredit())
         );
     }

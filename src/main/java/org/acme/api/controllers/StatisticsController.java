@@ -1,17 +1,14 @@
-package org.acme.api;
+package org.acme.api.controllers;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 
+import org.acme.api.RouteList;
 import org.acme.application.usecases.PresentApplicationMetricsUC;
 import org.acme.application.usecases.PresentSimulationsMetricsUC;
-import org.acme.domain.exceptions.InvalidProductId;
 import org.acme.domain.exceptions.InvalidReferenceDate;
-import org.acme.domain.exceptions.ProductNotFound;
 import org.acme.domain.payloads.errors.ErrorResponse;
-import org.acme.domain.payloads.generic.ResponseMessage;
 import org.acme.domain.payloads.loan.simulation.SimulationsSummaryResponse;
 import org.acme.domain.payloads.metrics.ApplicationMetricsResponse;
 
@@ -30,7 +27,7 @@ public class StatisticsController {
     @GET
     @Path("/")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getApplicationMetrics(@QueryParam("dataReferencia") String date){
+    public Response getApplicationMetrics(@QueryParam("dataReferencia") String date) {
         Response.ResponseBuilder response;
         try {
             LocalDate referenceDate = date != null ? LocalDate.parse(date) : LocalDate.now();
@@ -45,42 +42,25 @@ public class StatisticsController {
                 "Unprocessable Entity",
                 String.valueOf(unprocessableEntityCode),
                 errorMessages,
-                "/metrics"
+                RouteList.SHOW_APPLICATION_METRICS_PATH
             );
             response = Response.status(unprocessableEntityCode).entity(errorResponse);
         }
-        
         return response.build();
     }
 
     @GET
     @Path("/simulations")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getSimulationsMetrics(
-        @QueryParam("dataReferencia") String date,
-        @QueryParam("codigoProduto") Long productId
-    ){
+    public Response getSimulationsMetrics(@QueryParam("dataReferencia") String date ) {
         Response.ResponseBuilder response;
         try {
             LocalDate referenceDate = date != null ? LocalDate.parse(date) : LocalDate.now();
-            var metrics = presentSimulationsMetricsUC.execute(
-                referenceDate,
-                productId
-            );
-            if (metrics.simulationsSummary().interestRateAverage() == null) {
-                var text = String.format(
-                    "Não há simulações parametrizadas pelo produto '%s' em %s.",
-                    metrics.simulationsSummary().productDescription(),
-                    referenceDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-                );
-                var message = new ResponseMessage(text);
-                response = Response.ok(message);
-                return response.build();
-            }
+            var metrics = presentSimulationsMetricsUC.execute(referenceDate);
             var simulationsMetrics = SimulationsSummaryResponse.from(metrics);
             response = Response.ok(simulationsMetrics);
             return response.build();
-        } catch (InvalidReferenceDate | InvalidProductId e) {
+        } catch (InvalidReferenceDate e) {
             var errorMessages = new ArrayList<String>();
             errorMessages.add(e.getMessage());
             var unprocessableEntityCode = 422;
@@ -88,7 +68,7 @@ public class StatisticsController {
                 "Unprocessable Entity",
                 String.valueOf(unprocessableEntityCode),
                 errorMessages,
-                "/metrics/simulations"
+                RouteList.SHOW_SIMULATIONS_METRICS_PATH
             );
             response = Response.status(unprocessableEntityCode).entity(errorResponse);
             return response.build();
@@ -100,21 +80,9 @@ public class StatisticsController {
                 "Unprocessable Entity",
                 String.valueOf(unprocessableEntityCode),
                 errorMessages,
-                "/metrics/simulations"
+                RouteList.SHOW_SIMULATIONS_METRICS_PATH
             );
             response = Response.status(unprocessableEntityCode).entity(errorResponse);
-            return response.build();
-        } catch (ProductNotFound e) {
-            var errorMessages = new ArrayList<String>();
-            errorMessages.add(e.getMessage());
-            var notFoundCode = 404;
-            var errorResponse = ErrorResponse.from(
-                "Not Found",
-                String.valueOf(notFoundCode),
-                errorMessages,
-                "/metrics/simulations"
-            );
-            response = Response.status(Response.Status.NOT_FOUND).entity(errorResponse);
             return response.build();
         }
     }
