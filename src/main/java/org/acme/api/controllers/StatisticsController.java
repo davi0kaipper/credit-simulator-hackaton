@@ -11,6 +11,7 @@ import org.acme.domain.exceptions.InvalidReferenceDate;
 import org.acme.domain.payloads.errors.ErrorResponse;
 import org.acme.domain.payloads.loan.simulation.SimulationsSummaryResponse;
 import org.acme.domain.payloads.metrics.ApplicationMetricsResponse;
+import org.acme.infrastructure.integrations.eventhub.EventHubProducer;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.GET;
@@ -23,6 +24,7 @@ import jakarta.ws.rs.core.Response;
 public class StatisticsController {
     private @Inject PresentSimulationsMetricsUC presentSimulationsMetricsUC;
     private @Inject PresentApplicationMetricsUC presentApplicationMetricsUC;
+    private @Inject EventHubProducer eventHubProducer;
 
     @GET
     @Path("/")
@@ -59,6 +61,7 @@ public class StatisticsController {
             var metrics = presentSimulationsMetricsUC.execute(referenceDate);
             var simulationsMetrics = SimulationsSummaryResponse.from(metrics);
             response = Response.ok(simulationsMetrics);
+            this.eventHubProducer.sendEvent(simulationsMetrics.toString());
             return response.build();
         } catch (InvalidReferenceDate e) {
             var errorMessages = new ArrayList<String>();

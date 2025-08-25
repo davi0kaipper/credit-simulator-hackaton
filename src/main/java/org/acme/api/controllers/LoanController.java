@@ -14,6 +14,7 @@ import org.acme.domain.payloads.errors.ErrorResponse;
 import org.acme.domain.payloads.loan.simulation.ListSimulationsResponse;
 import org.acme.domain.payloads.loan.simulation.SimulationRequest;
 import org.acme.domain.payloads.loan.simulation.SimulationsResultResponse;
+import org.acme.infrastructure.integrations.eventhub.EventHubProducer;
 
 import jakarta.inject.Inject;
 import jakarta.persistence.NoResultException;
@@ -29,6 +30,7 @@ import jakarta.ws.rs.core.Response;
 public class LoanController {
     private @Inject ListSimulationsUC listSimulationsUC;
     private @Inject SimulateLoanUC simulateLoanUC;
+    private @Inject EventHubProducer eventHubProducer;
 
     @POST
     @Path("/simulation")
@@ -44,6 +46,7 @@ public class LoanController {
             var simulationsResultDto = simulateLoanUC.execute(simulationSolicitation);
             var simulationsResult = SimulationsResultResponse.from(simulationsResultDto);
             response = Response.ok(simulationsResult);
+            this.eventHubProducer.sendEvent(simulationsResult.toString());
         }
         catch (InvalidDesiredValueException | InvalidPeriodException e) {
             var errorMessages = new ArrayList<String>();
@@ -81,10 +84,12 @@ public class LoanController {
         @QueryParam("qtdRegistrosPagina") Integer recordsAmountByPage
     ){
         Response.ResponseBuilder response;
+
         try {
             var list = listSimulationsUC.execute(page, recordsAmountByPage);
             var simulationsList = ListSimulationsResponse.from(list);
             response = Response.ok(simulationsList);
+            this.eventHubProducer.sendEvent(simulationsList.toString());
         } catch (InvalidPageNumberException | InvalidRecordAmountByPageException e) {
             var errorMessages = new ArrayList<String>();
             errorMessages.add(e.getMessage());
